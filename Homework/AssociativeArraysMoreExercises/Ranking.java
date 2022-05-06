@@ -1,8 +1,7 @@
 package AssociativeArraysMoreExercises;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Ranking {
     public static void main(String[] args) {
@@ -18,7 +17,7 @@ public class Ranking {
             line = scanner.nextLine();
         }
         String line2 = scanner.nextLine();
-        Map<String, Map<String, Integer>> candidatesByPoints = new LinkedHashMap<>();
+        Map<String, Map<String, Integer>> candidatesByPoints = new TreeMap<>();
         while (!line2.equals("end of submissions")) {
             String[] data = line2.split("=>");
             String contest = data[0];
@@ -28,7 +27,7 @@ public class Ranking {
 
             if (contestsByPassword.containsKey(contest) && contestsByPassword.get(contest).equals(pass)) {
                 candidatesByPoints.putIfAbsent(username, new LinkedHashMap<>());
-                candidatesByPoints.get(username).put(contest, 0);
+                candidatesByPoints.get(username).putIfAbsent(contest, 0);
                 if (candidatesByPoints.get(username).get(contest) < points) {
                     candidatesByPoints.get(username).put(contest, points);
                 }
@@ -49,11 +48,11 @@ public class Ranking {
             }
         }
         System.out.printf("Best candidate is %s with total %d points.%n", bestCandidate, mostPoints);
+        System.out.println("Ranking:");
         for (Map.Entry<String, Map<String, Integer>> user : candidatesByPoints.entrySet()) {
             System.out.println(user.getKey());
-            for (Map.Entry<String, Integer> contest : user.getValue().entrySet()) {
-                System.out.printf("%s -> %d%n", contest.getKey(), contest.getValue());
-            }
+            user.getValue().entrySet().stream().sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
+                    .forEach((score) -> System.out.printf("#  %s -> %d%n", score.getKey(), score.getValue()));
 
         }
 
